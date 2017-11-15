@@ -1,0 +1,43 @@
+//-----------------------------------
+// Pause Campaigns for Potential Invalid Activity
+// Edited By: Dan Hough
+//-----------------------------------
+function main() {
+  // script to pause campaigns that have > 30% invalid clicks (and > 20 clicks) during the day.
+  // this assumes that a > 30% invalid click rate means that a specific campaign is being
+  // targeted by potential invalid activity. 
+  
+  var report = AdWordsApp.report(
+      'SELECT CampaignName, InvalidClickRate ' +
+      'FROM   CAMPAIGN_PERFORMANCE_REPORT ' +
+      'WHERE  InvalidClickRate > 0.3 ' +
+      'DURING TODAY');
+
+  var rows = report.rows();
+  
+  while (rows.hasNext()) {
+    var row = rows.next();
+    var campaignName = row['CampaignName'];
+    var invalidclickrate = row['InvalidClickRate'];
+    Logger.log(campaignName + ',' + invalidclickrate);
+  }
+
+  var campaigns = AdWordsApp.campaigns().withCondition("InvalidClickRate > 0.3").withCondition("Clicks > 20").forDateRange('TODAY').get();
+  while(campaigns.hasNext()) {
+    var campaign = campaigns.next();
+    
+	var recipient = "xxx@xxx.com";
+	var subject = "Account Paused Campaigns";
+	var body = "Campaign paused due to potential invalid activity: \n\n" + campaign;
+  
+  	if(!campaign.isPaused()){
+      campaign.pause();
+	  MailApp.sendEmail(recipient, subject, body);
+    }
+	
+    if(campaign.isPaused()){
+     Logger.log(campaign + ' is already paused');
+    }
+  }
+  
+}
