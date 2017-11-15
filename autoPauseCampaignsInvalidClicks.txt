@@ -1,6 +1,6 @@
 //-----------------------------------
 // Pause Campaigns for Potential Invalid Activity
-// Edited By: Dan Hough
+// Created By: Hoofay
 //-----------------------------------
 function main() {
   // script to pause campaigns that have > 30% invalid clicks (and > 20 clicks) during the day.
